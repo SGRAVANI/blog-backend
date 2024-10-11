@@ -57,7 +57,7 @@ const login=async(req,res)=>{
         console.log(userData)
         if(!userData)
         {
-            return res.status(404).json({message:"Invalid username"})
+            return res.status(400).json({message:"Invalid username"})
         }
         if(userData)
         {
@@ -69,7 +69,7 @@ const login=async(req,res)=>{
                return res.status(200).json({message:"login successful",userId:userData._id})
             }
             else{
-                return res.status(404).json({message:"Password Mismatch"})
+                return res.status(400).json({message:"Password Mismatch"})
             }
         }
     }
@@ -78,7 +78,7 @@ const login=async(req,res)=>{
             let userData=await UserModel.findOne({email})
             if(!userData)
             {
-                return res.status(404).json({message:"email does not exist"})
+                return res.status(400).json({message:"email does not exist"})
             }
             let iscorrectPwd=await userData.isPasswordCorrect(password)
            console.log(iscorrectPwd)
@@ -88,7 +88,7 @@ const login=async(req,res)=>{
                    return res.status(200).json({message:"login successful",user:userData})
                 }
                 else{
-                    return res.status(404).json({message:"Password Mismatch"})
+                    return res.status(400).json({message:"Password Mismatch"})
                 }
         
 
