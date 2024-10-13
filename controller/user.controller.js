@@ -22,7 +22,7 @@ const createUser=async (req,res)=>{
                 password
             })
             
-            const createdUser=await UserModel.findById({_id:user._id}).select()
+            const createdUser=await UserModel.findById({_id:user._id}).select('-password')
             
             if(createdUser)
             {
@@ -66,7 +66,7 @@ const login=async(req,res)=>{
           //  console.log(iscorrectPwd,"reached here")
             if(iscorrectPwd)
             {
-               return res.status(200).json({message:"login successful",userId:userData._id})
+               return res.status(200).json({message:"login successful",user:{...userData._doc,password:''}})
             }
             else{
                 return res.status(400).json({message:"Password Mismatch"})
@@ -85,7 +85,7 @@ const login=async(req,res)=>{
             if( iscorrectPwd)
                 {
                     
-                   return res.status(200).json({message:"login successful",user:userData})
+                   return res.status(200).json({message:"login successful",user:{...userData._doc,password:''}})
                 }
                 else{
                     return res.status(400).json({message:"Password Mismatch"})
@@ -96,7 +96,7 @@ const login=async(req,res)=>{
 
     }
     catch(e)
-    {
+    {   console.log(e)
         res.status(500).json({message:"error occured from server side"})
     }
 }

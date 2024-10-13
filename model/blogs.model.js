@@ -1,31 +1,53 @@
 import mongoose from 'mongoose';
+// const locationSchema=new mongoose.Schema({
+//     country:{
+//         type:String,
+//     },
+//     city:{
+//         type:String,
+//     },
+//     state:{
+//         type:String,
+//     }
+// },
+//     {
+//         timestamps:true,
+//     }
+// )
+//const LocationModel=mongoose.model('Location',locationSchema)
 
 const blogSchema = new mongoose.Schema({
-    blogTitle: {
+    title: {
         type: String,
         required: [true, 'Blog title is required'],
         trim: true,
         minlength: [5, 'Blog title must be at least 5 characters long'],
-        maxlength: [100, 'Blog title can be up to 100 characters long']
+       
     },
     image: {
         type: String, // URL of the image
-        required: [true, 'Image URL is required']
+       
     },
     content: {
         type: String,
         required: [true, 'Content is required'],
-        minlength: [50, 'Content must be at least 50 characters long']
+        //minlength: [50, 'Content must be at least 50 characters long']
     },
     subheading: {
         type: String,
         trim: true,
-        maxlength: [100, 'Subheading can be up to 100 characters long']
+      
     },
     labels: {
         type: [String], // Array of labels (tags or categories)
         default: [], // Optional
         validate: [arrayLimit, '{PATH} exceeds the limit of 10 labels']
+    },
+    location:{
+  //    type:mongoose.Schema.Types.ObjectId,
+   //   ref:'Location',
+     type:Object,
+
     },
     user: {
         type: mongoose.Schema.Types.ObjectId, // Reference to the User
@@ -33,6 +55,9 @@ const blogSchema = new mongoose.Schema({
         required: [true, 'User is required']
     }
 }, { timestamps: true }); // Automatically adds createdAt and updatedAt fields
+
+
+
 
 function arrayLimit(val) {
     return val.length <= 10;

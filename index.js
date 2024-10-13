@@ -8,7 +8,7 @@ const app=express()
 app.use(bodyParser.json())
 
 dotenv.config()
-app.use(cors('*'))
+app.use(cors())
 const PORT= process.env.PORT||8000
 const mongoURL=process.env.MONGO_URL
 mongoose.connect(mongoURL)
