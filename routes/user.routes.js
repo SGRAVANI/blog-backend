@@ -1,19 +1,15 @@
 import express from "express"
 import { fetch ,createUser, login} from "../controller/user.controller.js"
 import { createBlog, getBlogs,getUserSpecificBlogs,deleteBlog,getBlogById ,updateBlog,getBlogsByCountry} from "../controller/blog.controller.js";
-import { upload } from "../middleware/multer.middleware.js";
+//import { upload } from "../middleware/multer.middleware.js";
 const route=express.Router();
-
+// import multer from "multer";
+// const storage = multer.memoryStorage(); // No local storage
+// const upload = multer({ storage: storage });
 route.get("/fetch",fetch)
 route.post("/login",login)
 route.post("/register",createUser)
-route.post("/addblog",upload.fields([
-    {
-        name:'image',
-        maxCount:1
-    },
-    
-]),createBlog)
+route.post("/addblog",createBlog)
 //route.post("/addblog",createBlog)
 route.get("/getblogs",getBlogs)
 route.get("/getblogsbycountry",getBlogsByCountry)

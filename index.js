@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 import route from "./routes/user.routes.js";
 import cors from 'cors';
 const app=express()
+import fileupload from "express-fileupload"
 app.use(bodyParser.json())
 
 dotenv.config()
@@ -18,4 +19,7 @@ mongoose.connect(mongoURL)
     })
 })
 .catch((e)=>console.log(e.message))
+app.use(fileupload({
+    useTempFiles:true,
+}))
 app.use("/api/v1/user",route)

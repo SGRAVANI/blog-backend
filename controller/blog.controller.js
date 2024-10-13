@@ -1,64 +1,88 @@
 import BlogModel from "../model/blogs.model.js"; //
 import UserModel from "../model/user.model.js"; // 
-import { uploadOnCloudnary } from "../cloudinary.config.js";
+//import { uploadToCloudinary } from "../cloudinary.config.js";
 // Create a new blog
+import {v2 as cloudinary} from "cloudinary"
+cloudinary.config({ 
+    cloud_name: process.env.CLOUDNARY_CLOUD_NAME, 
+    api_key: process.env.CLOUDNARY_API_KEY, 
+    api_secret: process.env.CLOUDNARY_API_SECRET // Click 'View Credentials' below to copy your API secret
+});
 const createBlog = async (req, res) => {
     try {
         //console.log(req.body)
         console.log("create blog called")
         const { title, image, content, subheading, labels,userId,location } = req.body;
-
-        const imagePath=req.files?.image[0]?.path;
-        //  const coverImageLocalPath=req.files?.coverImage[0]?.path
-        // let coverImageLocalPath;
-        // if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length>0)
+        // const resultUrl = await uploadToCloudinary(req.file.buffer);
+        // res.status(200).json({ message: 'File uploaded successfully', url: resultUrl });
+      
+        // console.log(resultUrl)
+        
+        // if(!resultUrl)
         //     {
-        //      coverImageLocalPath=req.files.coverImage.path;
+        //         throw new ApiError(400,"Image file is required !!!")
         //     }
-        const imageUrl=await uploadOnCloudnary(imagePath)
-        console.log(imageUrl)
-        // const coverImage= coverImageLocalPath && await uploadOnCloudnary(coverImageLocalPath)
-        if(!imageUrl)
-            {
-                throw new ApiError(400,"Avatar file is required !!!")
-            }
-
         let locationOb=JSON.parse(location)
         console.log(content,locationOb)
         let labelsArray=labels.split(',')
 
-       //console.log("create blog called",labels)
-        // Validate required fields
-        //console.log( title, image, content, subheading, labels )
+       
         if (!title || !content || !subheading) {
             return res.status(400).json({ message: "Title, content, and subheading are required" });
         }
-
-        // Get the user who is creating the blog (assuming you are passing user ID in the request)
-        //const userId = req.userId; // Extract user ID from the request (e.g., from middleware)
-        //console.log(userId,"from req")
         const user = await UserModel.findById(userId).select("-password");
-       console.log(user)
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-       //console.log(user)
-        // Create the blog
-        const newBlog = await BlogModel.create({
+        console.log(user)
+         if (!user) {
+             return res.status(404).json({ message: "User not found" });
+         }
+ 
+   const file=req.files.image;
+   let imageURl;
+
+   cloudinary.uploader.upload(file.tempFilePath,(error,result,next)=>{
+    console.log(result)
+    imageURl=result.url;
+    const newBlog=new BlogModel({
+        
             title,
-            //image:imageUrl,
-            image:imageUrl.url,
+            
+          
+            image:imageURl,
             content,
             subheading,
             labels:labelsArray,
             user: userId,
             location:{...locationOb} 
-        });
+        
+    })
+    newBlog.save()
+    .then((result)=>{
+        return res.status(201).json({ message: "Blog created successfully", data: newBlog ,res:result});
+    })
+    .catch((e)=>{
+        console.log(e.message)
+    })
+   })
+        
+       
+       //console.log(user)
+        // Create the blog
+        // const newBlog = await BlogModel.create({
+        //     title,
+            
+          
+        //     image:imageURl,
+        //     content,
+        //     subheading,
+        //     labels:labelsArray,
+        //     user: userId,
+        //     location:{...locationOb} 
+        // });
 
         //await newBlog.save();
 
         // Return success response
-        return res.status(201).json({ message: "Blog created successfully", data: newBlog });
+        // return res.status(201).json({ message: "Blog created successfully", data: newBlog });
     } catch (e) {
         console.error("Error creating blog:", e); // Log error for debugging
        return res.status(500).json({ message: "An error occurred while creating the blog" });
